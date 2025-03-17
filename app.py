@@ -9,8 +9,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 openai.api_key = os.getenv('OPEN_API_KEY')
 
-# Force WebSockets and allow cross-origin requests
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet", logger=True, engineio_logger=True)
+# Enable WebSockets with CORS
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 @app.route('/')
 def index():
@@ -19,26 +19,36 @@ def index():
 @socketio.on('audio_chunk')
 def handle_audio_chunk(base64_data):
     try:
-        # Decode Base64 to binary
+        # Decode Base64 data to bytes
         byte_data = base64.b64decode(base64_data)
 
-        # Ensure buffer size is a multiple of element size
-        buffer_length = len(byte_data)
-        if buffer_length % 2 != 0:
-            byte_data += b'\x00'  # Padding to ensure even length
+        # Ensure buffer size is a multiple of element size (2 bytes for int16)
+        if len(byte_data) % 2 != 0:
+            byte_data += b'\x00'  # Pad with a null byte if necessary
 
-        # Convert byte buffer to NumPy array
+        # Convert buffer to NumPy array
         audio_data = np.frombuffer(byte_data, dtype=np.int16)
+
+        # Check if valid data exists
+        if len(audio_data) == 0:
+            emit('result', {'message': "Error: No audio data received", 'image': None})
+            return
 
         # Perform FFT Analysis
         N = len(audio_data)
-        T = 1.0 / 44100.0  # Assuming 44.1kHz sample rate
+        T = 1.0 / 44100.0  # Assuming standard sample rate
         yf = fft(audio_data)
         xf = np.fft.fftfreq(N, T)[:N//2]
 
         # Find peak frequency
         idx = np.argmax(np.abs(yf[:N//2]))
-        freq = xf[idx]
+
+        # Ensure valid frequency
+        freq = xf[idx] if idx < len(xf) else 0.0
+
+        # Convert frequency safely to string
+        freq_str = f"{freq:.2f}"
+
         # Log frequency for debugging
         print(f"Detected Frequency: {freq:.2f} Hz")
         if freq in "12":
@@ -47,9 +57,8 @@ def handle_audio_chunk(base64_data):
         else:
             image_result = "Lol no image"
 
-
-            # Send response to client
-        emit('result', {'message': f"Detected Frequency: {freq:.2f} Hz", 'image': image_result})
+        # Send response to client
+        emit('result', {'message': f"Detected Frequency: {freq_str} Hz", 'image': image_result})
 
     except Exception as e:
         print("Error processing audio:", str(e))
@@ -61,7 +70,7 @@ def generate_image(frequency):
         handler = fal_client.submit(
             "fal-ai/flux/dev",
             arguments={
-                "prompt": f"Abstract visualization of sound wave at {frequency:.2f} Hz, ethereal, digital art, glowing resonance"
+                "prompt": f"Abstract visualization of sound wave at {frequency} Hz, ethereal, digital art, glowing resonance"
             },
         )
         return handler.get()
