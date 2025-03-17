@@ -1,3 +1,7 @@
+ 
+Flask-SocketIO 
+numpy 
+scipy
 openai
 Flask
 requests==2.28.1
