@@ -133,7 +133,7 @@ def generate_image(frequencies):
             prompt=refined_prompt,
             size="512x512",
             quality="standard",
-            n=10,
+            n=1,
         )
         print(f"\n\n\nresponse.data  : \n\n\n\ {response.data}\n\n\n")
         return response.data[0].url if response.data else None
