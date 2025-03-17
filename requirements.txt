@@ -5,3 +5,4 @@ scipy
 openai
 fal_client
 gunicorn
+eventlet
