@@ -83,8 +83,36 @@ def stop_recording():
 def generate_image(frequencies):
     """Generates an image using OpenAI's DALL·E 3 based on cumulative frequency spectrum."""
     try:
-        frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])  # Limit for clarity
+        if not frequencies:
+            print("No frequencies detected. Skipping image generation.")
+            return None
 
+        # Limit to first 10 for clarity in prompt
+        frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])
+
+        # Map to known frequency ranges
+        human_speech = [85, 300, 3400]  # Hz range for human speech
+        nature_sounds = {
+            "Birdsong": (2000, 8000),
+            "Thunder": (20, 120),
+            "Ocean Waves": (10, 500),
+            "Wind Whistling": (1000, 4000),
+            "Whale Songs": (10, 300),
+        }
+
+        related_nature_sounds = [name for name, (low, high) in nature_sounds.items() if any(low <= f <= high for f in frequencies)]
+        related_human_sounds = [f for f in frequencies if human_speech[0] <= f <= human_speech[2]]
+
+        print("\n🎵 **Frequencies Captured:**", frequencies)
+        print("🔹 **Used in Image Prompt:**", frequency_str)
+        print("🌿 **Related to Nature Sounds:**", related_nature_sounds if related_nature_sounds else "None")
+        print("🗣️ **Human-Based Frequencies (Speech Range):**", related_human_sounds if related_human_sounds else "None")
+
+        image_importance = "This image represents an abstract visualization of sound waves detected in the environment, translating unseen vibrations into a perceptible, artistic form."
+
+        print("🎨 **Why This Image is Important:**", image_importance)
+
+        # Initialize OpenAI client with API key
         client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         response = client.images.generate(
@@ -96,7 +124,6 @@ def generate_image(frequencies):
         )
 
         return response.data[0].url if response.data else None
-
     except Exception as e:
         print("Image generation error:", str(e))
         return None
