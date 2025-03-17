@@ -1,5 +1,5 @@
 # Frequency Immersion 🎵🔮
-![Frequency Visualization](static/img/sample.png)
+![Frequency Visualization](static/img/sample2.png)
 ## **Overview**
 Frequency Immersion is an innovative **real-time sound visualization tool** that captures audio frequencies and translates them into **immersive, photorealistic visuals** using OpenAI's DALL·E 3. It bridges the gap between **sound and sight**, allowing users to experience music, speech, and natural sounds in a whole new way.
 
