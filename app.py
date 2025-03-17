@@ -116,7 +116,7 @@ def generate_image(frequencies):
         client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         chat_response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a prompt engineering expert, crafting DALL·E prompts that create ultra-realistic, immersive visuals based on sound frequencies."},
                 {"role": "user", "content": f"Given the following sound frequencies: {frequency_str}, craft a hyper-optimized prompt that results in a visually stunning, highly detailed, photorealistic representation of how these frequencies would be perceived by humans. Incorporate natural, cosmic, and emotional interpretations. The prompt should evoke sensations, energy, and a surreal yet deeply immersive scene."}
@@ -131,7 +131,7 @@ def generate_image(frequencies):
         response = client.images.generate(
             model="dall-e-3",
             prompt=refined_prompt,
-            size="1024x1024",
+            size="400x400",
             quality="standard",
             n=1,
         )
