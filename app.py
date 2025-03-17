@@ -41,12 +41,17 @@ def handle_audio_chunk(base64_data):
         xf = np.fft.fftfreq(N, T)[:N//2]
 
         # Find peak frequency
-        idx = np.argmax(np.abs(yf[:N//2]))
+        if len(xf) > 0 and len(yf) > 0:
+            idx = np.argmax(np.abs(yf[:N//2]))
+            freq = float(xf[idx]) if idx < len(xf) else 0.0
+        else:
+            freq = 0.0
 
-        # Ensure valid frequency
-        freq = xf[idx] if idx < len(xf) else 0.0
+        # Ensure frequency is a valid number
+        if np.isnan(freq) or np.isinf(freq):
+            freq = 0.0
 
-        # Convert frequency safely to string
+        # Convert frequency safely to a string
         freq_str = f"{freq:.2f}"
 
         # Log frequency for debugging
@@ -63,6 +68,7 @@ def handle_audio_chunk(base64_data):
     except Exception as e:
         print("Error processing audio:", str(e))
         emit('result', {'message': f"Error: {str(e)}", 'image': None})
+
 
 def generate_image(frequency):
     """Generates an abstract visualization using fal.ai"""
