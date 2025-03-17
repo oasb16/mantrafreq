@@ -1,14 +1,16 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request,
 from flask_socketio import SocketIO, emit
 import numpy as np
 from scipy.fft import fft
-import openai
+import openai, os
 import fal_client
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-socketio = SocketIO(app)
-openai.api_key = 'YOUR_OPENAI_API_KEY'
+openai.api_key = os.getenv('OPEN_API_KEY')
+
+# Force WebSockets and allow cross-origin requests
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 @app.route('/')
 def index():
