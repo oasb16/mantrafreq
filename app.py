@@ -28,8 +28,7 @@ def handle_audio_chunk(base64_data):
     global frequency_list
     try:
         byte_data = base64.b64decode(base64_data)
-        
-        # Ensure buffer size is a multiple of element size (2 bytes for int16)
+
         if len(byte_data) % 2 != 0:
             byte_data += b'\x00'
 
@@ -51,11 +50,9 @@ def handle_audio_chunk(base64_data):
         else:
             freq = 0.0
 
-        # Ensure valid frequency
         if np.isnan(freq) or np.isinf(freq):
             freq = 0.0
 
-        # Store frequency
         frequency_list.append(freq)
 
     except Exception as e:
@@ -70,30 +67,28 @@ def stop_recording():
             emit('result', {'message': "No frequencies detected.", 'image': None})
             return
 
-        # Generate image using cumulative frequency data
-        image_url = generate_image(frequency_list)
+        image_url, analysis_text = generate_image(frequency_list)
 
-        # Send response
-        emit('result', {'message': "Recording stopped. Image generated.", 'image': image_url})
+        emit('result', {
+            'message': "Recording stopped. Image generated.",
+            'image': image_url,
+            'analysis': analysis_text
+        })
 
     except Exception as e:
         print("Error generating image:", str(e))
         emit('result', {'message': f"Error: {str(e)}", 'image': None})
 
 
-
-
 def generate_image(frequencies):
-    """Creates a photorealistic immersive environment based on sound frequencies."""
+    """Creates an immersive visualization based on sound frequencies."""
     try:
         if not frequencies:
             print("No frequencies detected. Skipping image generation.")
-            return None
+            return None, "No analysis available."
 
-        # Convert frequencies into a readable format
         frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])
 
-        # **🔥 Step 1: Smart Scene Analysis**
         client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         response = client.chat.completions.create(
@@ -101,36 +96,29 @@ def generate_image(frequencies):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a frequency analyst and expert in AI-generated imagery. "
-                               "Your task is to interpret these frequencies and create a **real-world immersive scene** "
-                               "that matches them. Ensure a seamless **cinematic visual with dynamic motion, realistic lighting,** "
-                               "and environmental accuracy."
+                    "content": "You are a sound frequency analyst and AI-generated imagery expert. "
+                               "Your task is to match frequencies to real-world sounds and create an immersive scene that best represents them."
                 },
                 {
                     "role": "user",
                     "content": f"Analyze these sound frequencies: {frequency_str}. "
-                               "Match them to natural and human sources (e.g., ocean waves, thunderstorms, neon city hum, birds, wind, technology). "
-                               "Then, construct an **ultra-immersive, hyper-realistic DALL·E 3 prompt** that "
-                               "describes a visually consistent environment where these frequencies naturally occur. "
-                               "It should feel **cinematic, deeply atmospheric, and engaging**, avoiding abstract waves or randomness."
+                               "Identify their natural sources (e.g., ocean waves, birds, city noise) and generate an immersive DALL·E 3 prompt "
+                               "for a photorealistic scene where these sounds occur naturally. Avoid abstract waves or randomness."
                 }
             ],
             temperature=0.5,
             max_tokens=200,
         )
 
-        # Extract GPT-4o's response
         result_text = response.choices[0].message.content.strip()
 
-        # **Dynamically split**: Separate frequency analysis from final prompt
         result_parts = result_text.split("\n\n")
-        analysis_result = "\n\n".join(result_parts[:-1])  # Everything before last paragraph
-        refined_prompt = result_parts[-1]  # Optimized DALL·E prompt
+        analysis_result = "\n\n".join(result_parts[:-1])
+        refined_prompt = result_parts[-1]
 
-        print("\n🔍 **GPT-4o Scene Analysis:**", analysis_result)
+        print("\n🔍 **GPT-4o Analysis Result:**", analysis_result)
         print("\n🎨 **Final DALL·E 3 Prompt:**", refined_prompt)
 
-        # **🔥 Step 2: Generate Image**
         image_response = client.images.generate(
             model="dall-e-3",
             prompt=refined_prompt,
@@ -139,20 +127,13 @@ def generate_image(frequencies):
             n=1,
         )
 
-        # Extract image URL
         image_url = image_response.data[0].url if image_response.data else None
 
-        # **Final Debugging Info**
-        print("\n🎵 **Frequencies Captured:**", frequencies)
-        print("🔹 **Used in Image Prompt:**", frequency_str)
-        print("🌀 **Natural & Human Interpretations:**", analysis_result)
-        print("🎨 **Why This Image is Important:** This image visually translates complex sound frequencies into a cinematic, immersive scene where humans naturally experience these sounds.")
-
-        return image_url
+        return image_url, analysis_result
 
     except Exception as e:
         print("Image generation error:", str(e))
-        return None
+        return None, "Error generating analysis."
 
 
 if __name__ == '__main__':
