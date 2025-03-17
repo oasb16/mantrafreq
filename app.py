@@ -3,10 +3,11 @@ from flask_socketio import SocketIO, emit
 import numpy as np
 from scipy.fft import fft
 import openai, os, base64
-import fal_client
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
+
+# Initialize OpenAI client
 openai.api_key = os.getenv('OPEN_API_KEY')
 
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
@@ -74,26 +75,32 @@ def stop_recording():
             return
 
         # Generate image using cumulative frequency data
-        image_result = generate_image(frequency_list)
+        image_url = generate_image(frequency_list)
 
         # Send response
-        emit('result', {'message': "Recording stopped. Image generated.", 'image': image_result})
+        emit('result', {'message': "Recording stopped. Image generated.", 'image': image_url})
 
     except Exception as e:
         print("Error generating image:", str(e))
         emit('result', {'message': f"Error: {str(e)}", 'image': None})
 
 def generate_image(frequencies):
-    """Generates an image based on the cumulative frequency spectrum."""
+    """Generates an image using OpenAI's DALL·E 3 based on cumulative frequency spectrum."""
     try:
         frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])  # Limit for clarity
-        handler = fal_client.submit(
-            "fal-ai/flux/dev",
-            arguments={
-                "prompt": f"Abstract visualization of sound waves at {frequency_str}, ethereal, digital art, glowing resonance"
-            },
+
+        client = openai.OpenAI()
+
+        response = client.images.generate(
+            model="dall-e-3",
+            prompt=f"Abstract visualization of sound waves at {frequency_str}, ethereal, digital art, glowing resonance",
+            size="1024x1024",
+            quality="standard",
+            n=1,
         )
-        return handler.get()
+
+        return response.data[0].url if response.data else None
+
     except Exception as e:
         print("Image generation error:", str(e))
         return None
