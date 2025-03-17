@@ -4,12 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = document.getElementById('status');
     const generatedImage = document.getElementById('generated-image');
 
-    const socket = io({ transports: ["websocket"] }); // Ensure WebSockets only
+    const socket = io({ transports: ["websocket"] });
 
     let mediaRecorder;
 
     startButton.addEventListener('click', async () => {
         try {
+            socket.emit('start_recording'); // Notify server recording started
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
 
@@ -18,14 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     const arrayBuffer = await event.data.arrayBuffer();
                     const uint8Array = new Uint8Array(arrayBuffer);
 
-                    // Convert to Base64 for safe transmission
+                    // Convert to Base64 for transmission
                     const base64String = btoa(String.fromCharCode(...uint8Array));
-
                     socket.emit('audio_chunk', base64String);
                 }
             });
 
-            mediaRecorder.start(100); // Send data in 100ms chunks
+            mediaRecorder.start(100);
             startButton.disabled = true;
             stopButton.disabled = false;
             status.textContent = 'Recording...';
@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     stopButton.addEventListener('click', () => {
         if (mediaRecorder) {
             mediaRecorder.stop();
+            socket.emit('stop_recording'); // Notify server recording stopped
         }
         startButton.disabled = false;
         stopButton.disabled = true;
