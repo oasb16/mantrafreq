@@ -39,11 +39,9 @@ def handle_audio_chunk(base64_data):
         # Find peak frequency
         idx = np.argmax(np.abs(yf[:N//2]))
         freq = xf[idx]
-
-        if freq in "12":
         # Log frequency for debugging
-            print(f"Detected Frequency: {freq:.2f} Hz")
-
+        print(f"Detected Frequency: {freq:.2f} Hz")
+        if freq in "12":
             # Generate Image
             image_result = generate_image(freq)
         else:
