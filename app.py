@@ -129,7 +129,7 @@ def generate_image(frequencies):
         # 🔥 **Final Print Statements**
         print("\n🎵 **Frequencies Captured:**", frequencies)
         print("🔹 **Used in Image Prompt:**", frequency_str)
-        print("🌀 **Natural & Human Interpretations:**", analysis_result)
+        # print("🌀 **Natural & Human Interpretations:**", analysis_result)
         print("🎨 **Why This Image is Important:** This image represents an artistic translation of sound waves, allowing humans to visualize and feel sound beyond mere auditory perception.")
 
         return image_url
