@@ -1,5 +1,5 @@
 # Frequency Immersion 🎵🔮
-
+![Frequency Visualization](static/img/sample.png)
 ## **Overview**
 Frequency Immersion is an innovative **real-time sound visualization tool** that captures audio frequencies and translates them into **immersive, photorealistic visuals** using OpenAI's DALL·E 3. It bridges the gap between **sound and sight**, allowing users to experience music, speech, and natural sounds in a whole new way.
 
@@ -30,7 +30,7 @@ Frequency Immersion is an innovative **real-time sound visualization tool** that
 ## **🛠 Installation & Setup**
 ### **1️⃣ Clone the Repository**
 ```bash
-git clone https://github.com/yourusername/frequency-immersion.git
+git clone https://github.com/oasb16/mantrafreq.git
 cd frequency-immersion
 ```
 ### **2️⃣ Install Dependencies**
@@ -68,7 +68,7 @@ Pull requests are welcome! For major changes, open an issue first to discuss wha
 MIT License © 2025 **Your Name/Your Organization**
 
 ## **🌟 Support & Feedback**
-If you love **Frequency Immersion**, give it a ⭐ on [GitHub](https://github.com/yourusername/frequency-immersion)!
+If you love **Frequency Immersion**, give it a ⭐ on [GitHub](https://github.com/oasb16/mantrafreq.git)!
 
 ---
 🎶 **"Transforming sound waves into visual art"** 🎶
