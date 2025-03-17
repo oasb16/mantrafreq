@@ -57,5 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             generatedImage.style.display = 'none';
         }
+        if (data.analysis) {
+            document.getElementById('analysis-text').innerHTML = data.analysis;
+        }
     });
 });
