@@ -3,30 +3,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const stopButton = document.getElementById('stop');
     const status = document.getElementById('status');
     const generatedImage = document.getElementById('generated-image');
-    const socket = io();
+    
+    // Force WebSockets to prevent fallback to long polling
+    const socket = io({ transports: ["websocket"] });
 
     let mediaRecorder;
 
     startButton.addEventListener('click', async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
 
-        mediaRecorder.addEventListener('dataavailable', event => {
-            if (event.data.size > 0) {
-                event.data.arrayBuffer().then(buffer => {
-                    socket.emit('audio_chunk', buffer);
-                });
-            }
-        });
+            mediaRecorder.addEventListener('dataavailable', async event => {
+                if (event.data.size > 0) {
+                    const buffer = await event.data.arrayBuffer();
+                    const uint8Array = new Uint8Array(buffer);
+                    
+                    // Send audio chunk as Uint8Array
+                    socket.emit('audio_chunk', uint8Array);
+                }
+            });
 
-        mediaRecorder.start(100); // Send data in 100ms chunks
-        startButton.disabled = true;
-        stopButton.disabled = false;
-        status.textContent = 'Recording...';
+            mediaRecorder.start(100); // Send data in 100ms chunks
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            status.textContent = 'Recording...';
+        } catch (error) {
+            console.error("Error accessing microphone:", error);
+            status.textContent = "Microphone access denied.";
+        }
     });
 
     stopButton.addEventListener('click', () => {
-        mediaRecorder.stop();
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+        }
         startButton.disabled = false;
         stopButton.disabled = true;
         status.textContent = 'Processing...';
