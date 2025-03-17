@@ -107,7 +107,7 @@ def generate_image(frequencies):
 
         # Extract GPT-4o's response
         result_text = response.choices[0].message.content.strip()
-        
+        print(f"\n\n\n result_text: {result_text} \n\n\n")
         # Split analysis and prompt
         analysis_result, refined_prompt = result_text.split("\n\nPrompt: ", 1)
         
