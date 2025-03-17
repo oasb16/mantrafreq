@@ -60,7 +60,7 @@ def handle_audio_chunk(base64_data):
             # Generate Image
             image_result = generate_image(str(freq_str))
         else:
-            image_result = "Lol no image"
+            image_result = None
 
         # Send response to client
         emit('result', {'message': f"Detected Frequency: {freq_str} Hz", 'image': image_result})
