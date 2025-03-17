@@ -96,14 +96,18 @@ def generate_image(frequencies):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a sound frequency analyst and AI-generated imagery expert. "
-                               "Your task is to match frequencies to real-world sounds and create an immersive scene that best represents them."
+                    "content": "You are a frequency analyst and expert in AI-generated imagery. "
+                               "Your task is to interpret these frequencies and create a **real-world immersive scene** "
+                               "that matches them. Ensure a seamless **cinematic visual with dynamic motion, realistic lighting,** "
+                               "and environmental accuracy."
                 },
                 {
                     "role": "user",
                     "content": f"Analyze these sound frequencies: {frequency_str}. "
-                               "Identify their natural sources (e.g., ocean waves, birds, city noise) and generate an immersive DALL·E 3 prompt "
-                               "for a photorealistic scene where these sounds occur naturally. Avoid abstract waves or randomness."
+                               "Match them to natural and human sources (e.g., ocean waves, thunderstorms, neon city hum, birds, wind, technology). "
+                               "Then, construct an **ultra-immersive, hyper-realistic DALL·E 3 prompt** that "
+                               "describes a visually consistent environment where these frequencies naturally occur. "
+                               "It should feel **cinematic, deeply atmospheric, and engaging**, avoiding abstract waves or randomness."
                 }
             ],
             temperature=0.5,
