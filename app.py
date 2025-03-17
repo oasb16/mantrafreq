@@ -1,10 +1,14 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 import numpy as np
 from scipy.fft import fft
+import openai
+import fal_client
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
+openai.api_key = 'YOUR_OPENAI_API_KEY'
 
 @app.route('/')
 def index():
@@ -12,30 +16,33 @@ def index():
 
 @socketio.on('audio_chunk')
 def handle_audio_chunk(data):
-    # Convert audio data to numpy array
     audio_data = np.frombuffer(data, dtype=np.int16)
-    
-    # Perform FFT to find frequency components
     N = len(audio_data)
-    T = 1.0 / 44100.0  # Assuming a sample rate of 44100 Hz
+    T = 1.0 / 44100.0
     yf = fft(audio_data)
     xf = np.fft.fftfreq(N, T)[:N//2]
-    
-    # Find the peak frequency
     idx = np.argmax(np.abs(yf[:N//2]))
     freq = xf[idx]
-    
-    # Define the target frequency for the mantra (e.g., 417 Hz)
     target_freq = 417
-    tolerance = 5  # Allowable deviation in Hz
+    tolerance = 5
     
-    # Check if the detected frequency matches the target frequency within tolerance
     if abs(freq - target_freq) <= tolerance:
         result = f"Correct! Detected frequency: {freq:.2f} Hz"
+        image_result = generate_image(freq)
     else:
         result = f"Incorrect. Detected frequency: {freq:.2f} Hz"
+        image_result = None
     
-    emit('result', result)
+    emit('result', {'message': result, 'image': image_result})
+
+def generate_image(frequency):
+    handler = fal_client.submit(
+        "fal-ai/flux/dev",
+        arguments={
+            "prompt": f"Abstract visualization of sound wave at {frequency:.2f} Hz, ethereal, digital art, glowing resonance"
+        },
+    )
+    return handler.get()
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

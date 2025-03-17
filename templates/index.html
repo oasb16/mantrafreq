@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mantra Frequency Analyzer</title>
 </head>
 <body>
@@ -9,7 +10,9 @@
     <button id="start">Start Recording</button>
     <button id="stop" disabled>Stop Recording</button>
     <p id="status"></p>
+    <img id="generated-image" src="" style="display:none;" alt="Generated Mantra Frequency Visualization">
+    
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <script type="module" src="{{ url_for('static', filename='js/recorder.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/recorder.js') }}"></script>
 </body>
 </html>

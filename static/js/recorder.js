@@ -1,44 +1,25 @@
-import { RealtimeClient } from '@openai/realtime-api-beta';
-
 document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('start');
     const stopButton = document.getElementById('stop');
     const status = document.getElementById('status');
+    const generatedImage = document.getElementById('generated-image');
+    const socket = io();
 
     let mediaRecorder;
-    let client;
 
     startButton.addEventListener('click', async () => {
-        // Initialize the RealtimeClient
-        client = new RealtimeClient({
-            apiKey: 'YOUR_OPENAI_API_KEY',
-            dangerouslyAllowAPIKeyInBrowser: true,
-        });
-
-        // Set up event handling
-        client.on('response', (response) => {
-            // Process the response from the API
-            console.log('API Response:', response);
-            status.textContent = 'Processing complete.';
-        });
-
-        // Connect to the Realtime API
-        await client.connect();
-
-        // Request microphone access
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        mediaRecorder = new MediaRecorder(stream);
 
-        mediaRecorder.addEventListener('dataavailable', async (event) => {
+        mediaRecorder.addEventListener('dataavailable', event => {
             if (event.data.size > 0) {
-                const arrayBuffer = await event.data.arrayBuffer();
-                const audioData = new Int16Array(arrayBuffer);
-                client.sendAudio(audioData);
+                event.data.arrayBuffer().then(buffer => {
+                    socket.emit('audio_chunk', buffer);
+                });
             }
         });
 
         mediaRecorder.start(100); // Send data in 100ms chunks
-
         startButton.disabled = true;
         stopButton.disabled = false;
         status.textContent = 'Recording...';
@@ -46,9 +27,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     stopButton.addEventListener('click', () => {
         mediaRecorder.stop();
-        client.sendAudio(null); // Signal end of audio stream
         startButton.disabled = false;
         stopButton.disabled = true;
         status.textContent = 'Processing...';
+    });
+
+    socket.on('result', data => {
+        status.textContent = data.message;
+        if (data.image) {
+            generatedImage.src = data.image;
+            generatedImage.style.display = 'block';
+        } else {
+            generatedImage.style.display = 'none';
+        }
     });
 });
