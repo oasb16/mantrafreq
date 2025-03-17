@@ -6,10 +6,6 @@ import openai, os, base64
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-
-# Initialize OpenAI client
-openai.api_key = os.getenv('OPEN_API_KEY')
-
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 # Global list to store detected frequencies
@@ -90,7 +86,8 @@ def generate_image(frequencies):
         frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])  # Limit for clarity
 
         client = openai.OpenAI()
-
+        # Initialize OpenAI client
+        client.api_key = os.getenv('OPEN_API_KEY')
         response = client.images.generate(
             model="dall-e-3",
             prompt=f"Abstract visualization of sound waves at {frequency_str}, ethereal, digital art, glowing resonance",
