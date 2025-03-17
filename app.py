@@ -129,13 +129,13 @@ def generate_image(frequencies):
         print("\n🔮 **Generated Optimized DALL·E Prompt:**", refined_prompt)
 
         response = client.images.generate(
-            model="dall-e-3",
+            model="dall-e-2",
             prompt=refined_prompt,
-            size="400x400",
+            size="512x512",
             quality="standard",
-            n=1,
+            n=10,
         )
-
+        print(f"\n\n\nresponse.data  : \n\n\n\ {response.data}\n\n\n")
         return response.data[0].url if response.data else None
     except Exception as e:
         print("Image generation error:", str(e))
