@@ -81,16 +81,16 @@ def stop_recording():
         emit('result', {'message': f"Error: {str(e)}", 'image': None})
 
 def generate_image(frequencies):
-    """Generates an image using OpenAI's DALL·E 3 based on cumulative frequency spectrum."""
+    """Generates an ultra-immersive image using OpenAI's DALL·E 3 based on the cumulative frequency spectrum."""
     try:
         if not frequencies:
             print("No frequencies detected. Skipping image generation.")
             return None
 
-        # Limit to first 10 for clarity in prompt
+        # Extract frequency details
         frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])
 
-        # Map to known frequency ranges
+        # Map frequencies to natural and human-based sounds
         human_speech = [85, 300, 3400]  # Hz range for human speech
         nature_sounds = {
             "Birdsong": (2000, 8000),
@@ -103,42 +103,56 @@ def generate_image(frequencies):
         related_nature_sounds = [name for name, (low, high) in nature_sounds.items() if any(low <= f <= high for f in frequencies)]
         related_human_sounds = [f for f in frequencies if human_speech[0] <= f <= human_speech[2]]
 
+        # 🌍 Determine an immersive real-world setting based on detected sounds
+        if {"Ocean Waves", "Wind Whistling", "Whale Songs"} & set(related_nature_sounds):
+            scene = "a vast open seaface, with waves crashing, misty air, and birds gliding above the horizon."
+        elif {"Birdsong", "Wind Whistling"} & set(related_nature_sounds):
+            scene = "a lush mountain valley at sunrise, with golden rays piercing the mist, trees swaying, and birds fluttering."
+        elif {"Thunder"} & set(related_nature_sounds):
+            scene = "a powerful thunderstorm over a distant, futuristic city, with neon lights reflecting off the rain-soaked streets."
+        else:
+            scene = "an abstract cosmic landscape, where sound waves transform into swirling nebulae and floating energy ribbons."
+
+        # 🌟 **Print Log for Debugging**
         print("\n🎵 **Frequencies Captured:**", frequencies)
         print("🔹 **Used in Image Prompt:**", frequency_str)
         print("🌿 **Related to Nature Sounds:**", related_nature_sounds if related_nature_sounds else "None")
         print("🗣️ **Human-Based Frequencies (Speech Range):**", related_human_sounds if related_human_sounds else "None")
+        print("🌌 **Scene Chosen:**", scene)
 
-        image_importance = "This image represents an abstract visualization of sound waves detected in the environment, translating unseen vibrations into a perceptible, artistic form."
-
-        print("🎨 **Why This Image is Important:**", image_importance)
-
-        # Initialize OpenAI client with API key
+        # 🔮 **Generate an Ultra-Optimized Prompt for DALL·E 3 using GPT-4o**
         client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         chat_response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "You are a prompt engineering expert, crafting DALL·E prompts that create ultra-realistic, immersive visuals based on sound frequencies."},
-                {"role": "user", "content": f"Given the following sound frequencies: {frequency_str}, craft a hyper-optimized prompt that results in a visually stunning, highly detailed, photorealistic representation of how these frequencies would be perceived by humans. Incorporate natural, cosmic, and emotional interpretations. The prompt should evoke sensations, energy, and a surreal yet deeply immersive scene."}
+                {"role": "system", "content": "You are an expert in prompt engineering, crafting highly immersive and surreal visuals based on sound frequencies."},
+                {"role": "user", "content": f"""
+                Given the following sound frequencies: {frequency_str}, create a hyper-optimized prompt for DALL·E 3 that results in a visually stunning, photorealistic representation. The scene should be deeply immersive and elicit emotions tied to these frequencies. The setting should be {scene}, with surreal, dreamlike lighting and ethereal effects. The image should make the user feel drawn into the world, evoking both serenity and awe. Craft the most powerful, emotionally resonant, and mesmerizing prompt possible.
+                """}
             ],
-            temperature=0.7,  # Ensures a balance of creativity and control
-            max_tokens=150,  # Keeps it concise yet powerful
+            temperature=0.7,
+            max_tokens=150,
         )
 
         refined_prompt = chat_response.choices[0].message.content.strip()
         print("\n🔮 **Generated Optimized DALL·E Prompt:**", refined_prompt)
 
+        # 🎨 Generate the Image with DALL·E 3
         response = client.images.generate(
-            model="dall-e-2",
+            model="dall-e-3",
             prompt=refined_prompt,
-            size="512x512",
+            size="1024x1024",
             quality="standard",
             n=1,
         )
-        print(f"\n\n\nresponse.data  : \n\n\n\ {response.data}\n\n\n")
+
+        # 🌟 Return Image URL
+        print(f"\n\n🔗 **Generated Image URL:** {response.data[0].url if response.data else 'None'}")
         return response.data[0].url if response.data else None
+
     except Exception as e:
-        print("Image generation error:", str(e))
+        print("⚠️ Image generation error:", str(e))
         return None
 
 if __name__ == '__main__':
