@@ -85,9 +85,8 @@ def generate_image(frequencies):
     try:
         frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])  # Limit for clarity
 
-        client = openai.OpenAI()
-        # Initialize OpenAI client
-        client.api_key = os.getenv('OPEN_API_KEY')
+        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
         response = client.images.generate(
             model="dall-e-3",
             prompt=f"Abstract visualization of sound waves at {frequency_str}, ethereal, digital art, glowing resonance",
