@@ -82,40 +82,40 @@ def stop_recording():
 
 
 
+
 def generate_image(frequencies):
-    """Dynamically analyzes sound frequencies and generates an immersive image with DALL·E 3."""
+    """Analyzes sound frequencies and generates a visually relevant image using DALL·E 3."""
     try:
         if not frequencies:
             print("No frequencies detected. Skipping image generation.")
             return None
 
         # Convert frequencies into a readable string
-        frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])  # Limit to 10 for clarity
+        frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])  # Limit for clarity
 
-        # Initialize OpenAI GPT client
+        # **🔥 Step 1: Get Meaningful Sound Interpretations**
         client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-        # 🔍 **Step 1: Ask GPT-4o for a SHORTER response**
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an expert in sound frequency analysis and AI-generated imagery. "
-                               "Your task is to analyze given frequencies for their real-world occurrences "
-                               "(e.g., nature, music, machines, cosmic sounds) and summarize key insights concisely. "
-                               "Then, create a **brief but ultra-immersive** DALL·E 3 prompt that translates these frequencies into a surreal, evocative image."
+                    "content": "You are an expert in acoustic analysis and AI-generated imagery. "
+                               "Given a set of frequencies, your task is to analyze their natural and human interpretations "
+                               "and construct a **visually realistic and immersive** DALL·E 3 prompt."
                 },
                 {
                     "role": "user",
                     "content": f"Analyze these sound frequencies: {frequency_str}. "
-                               "Summarize in **5 short bullet points** how humans perceive them and their natural connections (e.g., thunder, wind, bird song). "
-                               "Then, generate a **very concise and optimized** DALL·E 3 prompt that captures an immersive visual inspired by these sounds. "
-                               "Limit response to **200 words total**."
+                               "Briefly describe **3-4 distinct real-world sources** that match these frequencies "
+                               "(e.g., ocean waves, birds, wind, electronic hum). "
+                               "Then, **construct a photorealistic, immersive** DALL·E 3 prompt that reflects how these sounds "
+                               "would look in a realistic environment."
                 }
             ],
             temperature=0.6,
-            max_tokens=200,  # Reduced to prevent long responses
+            max_tokens=200,  # Ensure response stays short & meaningful
         )
 
         # Extract GPT-4o's response
@@ -127,9 +127,9 @@ def generate_image(frequencies):
         refined_prompt = result_parts[-1]  # Last paragraph is the optimized prompt
 
         print("\n🔍 **GPT-4o Analysis (Concise):**", analysis_result)
-        print("\n🔮 **Optimized DALL·E 3 Prompt:**", refined_prompt)
+        print("\n🎨 **Final DALL·E 3 Prompt:**", refined_prompt)
 
-        # 🎨 **Step 2: Generate Image using DALL·E 3**
+        # **🔥 Step 2: Generate Image using DALL·E 3**
         image_response = client.images.generate(
             model="dall-e-3",
             prompt=refined_prompt,
