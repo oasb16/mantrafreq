@@ -3,16 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mantra Frequency Analyzer</title>
+    <title>FREQUENCY VISUALIZER</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.js"></script>
+    <script src="recorder.js" defer></script>
 </head>
 <body>
-    <h1>Mantra Frequency Analyzer</h1>
-    <button id="start">Start Recording</button>
-    <button id="stop" disabled>Stop Recording</button>
-    <p id="status"></p>
-    <img id="generated-image" src="" style="display:none;" alt="Generated Mantra Frequency Visualization">
-    
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/recorder.js') }}"></script>
+    <div class="container">
+        <h1 class="glow-text">🔊 Frequency Immersion</h1>
+
+        <div class="buttons">
+            <button id="start" class="btn pulse">🎙 Start Recording</button>
+            <button id="stop" class="btn disabled">⏹ Stop</button>
+        </div>
+
+        <div class="status-box">
+            <p id="status">Awaiting Input...</p>
+        </div>
+
+        <div class="frequency-box">
+            <h2>Captured Frequencies:</h2>
+            <div id="frequency-list" class="frequency-list"></div>
+        </div>
+
+        <div class="image-container">
+            <h2>Generated Visualization:</h2>
+            <img id="generated-image" style="display:none;" alt="Frequency Visualization">
+        </div>
+
+        <div class="footer">
+            <p>✨ Transforming sound waves into **visual art**</p>
+        </div>
+    </div>
 </body>
 </html>

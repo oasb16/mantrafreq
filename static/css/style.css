@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', sans-serif;
+    background: radial-gradient(circle, #090A0F 10%, #12141C 100%);
+    color: #ffffff;
+    text-align: center;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.glow-text {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #00E0FF;
+    text-shadow: 0 0 10px #00E0FF, 0 0 40px #007A99;
+    animation: pulseGlow 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+    from {
+        text-shadow: 0 0 10px #00E0FF, 0 0 40px #007A99;
+    }
+    to {
+        text-shadow: 0 0 20px #00E0FF, 0 0 50px #0099CC;
+    }
+}
+
+.buttons {
+    margin: 20px;
+}
+
+.btn {
+    background: linear-gradient(45deg, #00E0FF, #00C6FF);
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #12141C;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 0 15px #00C6FF;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px #00E0FF;
+}
+
+.btn.disabled {
+    background: #555;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.status-box {
+    margin: 20px;
+    padding: 10px 20px;
+    background: rgba(0, 224, 255, 0.1);
+    border: 1px solid #00E0FF;
+    border-radius: 5px;
+    font-size: 1.2rem;
+}
+
+.frequency-box {
+    margin-top: 30px;
+    padding: 20px;
+    width: 60%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 224, 255, 0.2);
+}
+
+.frequency-list {
+    font-size: 1rem;
+    color: #00E0FF;
+}
+
+.image-container {
+    margin-top: 30px;
+    width: 80%;
+}
+
+.image-container img {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #00E0FF;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.footer {
+    margin-top: 40px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+}
