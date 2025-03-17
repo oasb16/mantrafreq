@@ -25,17 +25,8 @@ def handle_audio_chunk(data):
     xf = np.fft.fftfreq(N, T)[:N//2]
     idx = np.argmax(np.abs(yf[:N//2]))
     freq = xf[idx]
-    target_freq = 417
-    tolerance = 5
-    
-    if abs(freq - target_freq) <= tolerance:
-        result = f"Correct! Detected frequency: {freq:.2f} Hz"
-        image_result = generate_image(freq)
-    else:
-        result = f"Incorrect. Detected frequency: {freq:.2f} Hz"
-        image_result = None
-    
-    emit('result', {'message': result, 'image': image_result})
+    image_result = generate_image(freq)
+    emit('result', {'message': "Checkout the image", 'image': image_result})
 
 def generate_image(frequency):
     handler = fal_client.submit(
