@@ -56,9 +56,9 @@ def handle_audio_chunk(base64_data):
 
         # Log frequency for debugging
         print(f"Detected Frequency: {freq:.2f} Hz")
-        if freq in "12":
+        if freq_str in "12":
             # Generate Image
-            image_result = generate_image(freq)
+            image_result = generate_image(str(freq_str))
         else:
             image_result = "Lol no image"
 
