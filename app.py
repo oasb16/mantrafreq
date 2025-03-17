@@ -40,13 +40,17 @@ def handle_audio_chunk(base64_data):
         idx = np.argmax(np.abs(yf[:N//2]))
         freq = xf[idx]
 
+        if freq in "12":
         # Log frequency for debugging
-        print(f"Detected Frequency: {freq:.2f} Hz")
+            print(f"Detected Frequency: {freq:.2f} Hz")
 
-        # Generate Image
-        image_result = generate_image(freq)
+            # Generate Image
+            image_result = generate_image(freq)
+        else:
+            image_result = "Lol no image"
 
-        # Send response to client
+
+            # Send response to client
         emit('result', {'message': f"Detected Frequency: {freq:.2f} Hz", 'image': image_result})
 
     except Exception as e:
