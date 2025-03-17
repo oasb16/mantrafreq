@@ -3,9 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const stopButton = document.getElementById('stop');
     const status = document.getElementById('status');
     const generatedImage = document.getElementById('generated-image');
-    
-    // Force WebSockets to prevent fallback to long polling
-    const socket = io({ transports: ["websocket"] });
+
+    const socket = io({ transports: ["websocket"] }); // Ensure WebSockets only
 
     let mediaRecorder;
 
@@ -16,11 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             mediaRecorder.addEventListener('dataavailable', async event => {
                 if (event.data.size > 0) {
-                    const buffer = await event.data.arrayBuffer();
-                    const uint8Array = new Uint8Array(buffer);
-                    
-                    // Send audio chunk as Uint8Array
-                    socket.emit('audio_chunk', uint8Array);
+                    const arrayBuffer = await event.data.arrayBuffer();
+                    const uint8Array = new Uint8Array(arrayBuffer);
+
+                    // Convert to Base64 for safe transmission
+                    const base64String = btoa(String.fromCharCode(...uint8Array));
+
+                    socket.emit('audio_chunk', base64String);
                 }
             });
 

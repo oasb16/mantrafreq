@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 import numpy as np
 from scipy.fft import fft
-import openai, os
+import openai, os, base64
 import fal_client
 
 app = Flask(__name__)
@@ -17,15 +17,18 @@ def index():
     return render_template('index.html')
 
 @socketio.on('audio_chunk')
-def handle_audio_chunk(data):
+def handle_audio_chunk(base64_data):
     try:
-        # Convert Uint8Array (JS) to proper byte buffer
-        byte_data = bytes(data)
-        audio_data = np.frombuffer(byte_data, dtype=np.int16)
+        # Decode Base64 to binary
+        byte_data = base64.b64decode(base64_data)
 
-        # Ensure buffer size is a multiple of 2
-        if len(audio_data) % 2 != 0:
-            audio_data = np.pad(audio_data, (0, 1), mode='constant')
+        # Ensure buffer size is a multiple of element size
+        buffer_length = len(byte_data)
+        if buffer_length % 2 != 0:
+            byte_data += b'\x00'  # Padding to ensure even length
+
+        # Convert byte buffer to NumPy array
+        audio_data = np.frombuffer(byte_data, dtype=np.int16)
 
         # Perform FFT Analysis
         N = len(audio_data)
