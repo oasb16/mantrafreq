@@ -80,7 +80,6 @@ def stop_recording():
         print("Error generating image:", str(e))
         emit('result', {'message': f"Error: {str(e)}", 'image': None})
 
-
 def generate_image(frequencies):
     """Dynamically analyzes sound frequencies and generates an immersive image with DALL·E 3."""
     try:
@@ -99,25 +98,27 @@ def generate_image(frequencies):
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are an expert in frequency analysis, sound perception, and prompt engineering for DALL·E 3. Your task is to analyze given frequencies for their real-world occurrences and create an ultra-immersive prompt for an AI-generated image that represents these sound waves."},
-                {"role": "user", "content": f"Analyze the following sound frequencies: {frequency_str}. Identify their natural occurrences (e.g., birds, ocean waves, thunder, wind, cosmic sounds, machines, musical notes), how humans perceive them (e.g., soothing, eerie, chaotic, mystical), and any cultural or mystical significance. Then, create a highly optimized, photorealistic DALL·E 3 prompt that generates a deeply immersive and surreal image, evoking emotions and sensations based on the captured sound waves. "}
+                {"role": "user", "content": f"Analyze the following sound frequencies: {frequency_str}. Identify their natural occurrences (e.g., birds, ocean waves, thunder, wind, cosmic sounds, machines, musical notes), how humans perceive them (e.g., soothing, eerie, chaotic, mystical), and any cultural or mystical significance. Then, at the end, create a highly optimized, photorealistic DALL·E 3 prompt that generates a deeply immersive and surreal image, evoking emotions and sensations based on the captured sound waves. Make sure to clearly separate the analysis and the prompt."}
             ],
             temperature=0.7,
-            max_tokens=400,  # Higher to capture both analysis and prompt
+            max_tokens=400,  # Ensures room for both analysis and prompt
         )
 
         # Extract GPT-4o's response
         result_text = response.choices[0].message.content.strip()
-        print(f"\n\n\n result_text: {result_text} \n\n\n")
-        # Split analysis and prompt
-        analysis_result, refined_prompt = result_text.split("ThePromptis", 1)
-        
+
+        # **New Extraction Logic:** Split response dynamically
+        result_parts = result_text.split("\n\n")
+        analysis_result = "\n\n".join(result_parts[:-1])  # Everything before last paragraph
+        refined_prompt = result_parts[-1]  # Last paragraph is the prompt
+
         print("\n🔍 **GPT-4o Analysis Result:**", analysis_result)
         print("\n🔮 **Optimized DALL·E 3 Prompt:**", refined_prompt)
 
         # 🎨 **Step 2: Generate Image using DALL·E 3**
         image_response = client.images.generate(
             model="dall-e-3",
-            prompt=result_text,
+            prompt=refined_prompt,
             size="1024x1024",
             quality="standard",
             n=1,
