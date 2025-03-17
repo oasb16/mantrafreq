@@ -6,7 +6,7 @@ import openai, os, base64
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet", ping_interval=25)
 
 # Global list to store detected frequencies
 frequency_list = []
