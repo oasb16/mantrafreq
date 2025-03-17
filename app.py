@@ -133,7 +133,7 @@ def generate_image(frequencies):
 
         image_url = image_response.data[0].url if image_response.data else None
 
-        return image_url, analysis_result
+        return image_url, refined_prompt
 
     except Exception as e:
         print("Image generation error:", str(e))
