@@ -84,16 +84,16 @@ def stop_recording():
 
 
 def generate_image(frequencies):
-    """Analyzes sound frequencies and generates a visually relevant image using DALL·E 3."""
+    """Creates a photorealistic immersive environment based on sound frequencies."""
     try:
         if not frequencies:
             print("No frequencies detected. Skipping image generation.")
             return None
 
-        # Convert frequencies into a readable string
-        frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])  # Limit for clarity
+        # Convert frequencies into a readable format
+        frequency_str = ", ".join(f"{freq:.2f} Hz" for freq in frequencies[:10])
 
-        # **🔥 Step 1: Get Meaningful Sound Interpretations**
+        # **🔥 Step 1: Smart Scene Analysis**
         client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         response = client.chat.completions.create(
@@ -101,35 +101,36 @@ def generate_image(frequencies):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an expert in acoustic analysis and AI-generated imagery. "
-                               "Given a set of frequencies, your task is to analyze their natural and human interpretations "
-                               "and construct a **visually realistic and immersive** DALL·E 3 prompt."
+                    "content": "You are a frequency analyst and expert in AI-generated imagery. "
+                               "Your task is to interpret these frequencies and create a **real-world immersive scene** "
+                               "that matches them. Ensure a seamless **cinematic visual with dynamic motion, realistic lighting,** "
+                               "and environmental accuracy."
                 },
                 {
                     "role": "user",
                     "content": f"Analyze these sound frequencies: {frequency_str}. "
-                               "Briefly describe **3-4 distinct real-world sources** that match these frequencies "
-                               "(e.g., ocean waves, birds, wind, electronic hum). "
-                               "Then, **construct a photorealistic, immersive** DALL·E 3 prompt that reflects how these sounds "
-                               "would look in a realistic environment."
+                               "Match them to natural and human sources (e.g., ocean waves, thunderstorms, neon city hum, birds, wind, technology). "
+                               "Then, construct an **ultra-immersive, hyper-realistic DALL·E 3 prompt** that "
+                               "describes a visually consistent environment where these frequencies naturally occur. "
+                               "It should feel **cinematic, deeply atmospheric, and engaging**, avoiding abstract waves or randomness."
                 }
             ],
-            temperature=0.6,
-            max_tokens=200,  # Ensure response stays short & meaningful
+            temperature=0.5,
+            max_tokens=200,
         )
 
         # Extract GPT-4o's response
         result_text = response.choices[0].message.content.strip()
 
-        # **New Extraction Logic:** Dynamically split response
+        # **Dynamically split**: Separate frequency analysis from final prompt
         result_parts = result_text.split("\n\n")
         analysis_result = "\n\n".join(result_parts[:-1])  # Everything before last paragraph
-        refined_prompt = result_parts[-1]  # Last paragraph is the optimized prompt
+        refined_prompt = result_parts[-1]  # Optimized DALL·E prompt
 
-        print("\n🔍 **GPT-4o Analysis (Concise):**", analysis_result)
+        print("\n🔍 **GPT-4o Scene Analysis:**", analysis_result)
         print("\n🎨 **Final DALL·E 3 Prompt:**", refined_prompt)
 
-        # **🔥 Step 2: Generate Image using DALL·E 3**
+        # **🔥 Step 2: Generate Image**
         image_response = client.images.generate(
             model="dall-e-3",
             prompt=refined_prompt,
@@ -141,11 +142,11 @@ def generate_image(frequencies):
         # Extract image URL
         image_url = image_response.data[0].url if image_response.data else None
 
-        # 🔥 **Final Print Statements**
+        # **Final Debugging Info**
         print("\n🎵 **Frequencies Captured:**", frequencies)
         print("🔹 **Used in Image Prompt:**", frequency_str)
         print("🌀 **Natural & Human Interpretations:**", analysis_result)
-        print("🎨 **Why This Image is Important:** This image represents an artistic translation of sound waves, allowing humans to visualize and feel sound beyond mere auditory perception.")
+        print("🎨 **Why This Image is Important:** This image visually translates complex sound frequencies into a cinematic, immersive scene where humans naturally experience these sounds.")
 
         return image_url
 
